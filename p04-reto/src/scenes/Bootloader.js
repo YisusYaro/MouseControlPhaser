@@ -139,7 +139,7 @@ class Bootloader extends Phaser.Scene {
     this.demon.scale = 4;
 
     this.knight = this.add.image(200, 250, 'knight');
-    this.knight.scale = 2;
+    this.knight.scale = 4;
   }
 
   update(time, delta) {
