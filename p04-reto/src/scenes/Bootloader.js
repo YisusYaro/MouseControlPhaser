@@ -8,6 +8,7 @@ export default class Bootloader extends Phaser.Scene {
     });
     this.cards = ["imagen1", "imagen2", "imagen3", "imagen4", "imagen5", "imagen6",
       "imagen7", "imagen8", "imagen9", "imagen10", "imagen11", "imagen12"];
+    this.selectedCards = [];
   }
 
   init() {
@@ -39,20 +40,29 @@ export default class Bootloader extends Phaser.Scene {
     for (let j = yFisrtCardFirstRow; j <= yFisrtCardLastRow; j += yStepCard) {
       for (let i = xFirstCardFirstRow; i <= xLastCardFisrtRow; i += xStepCard) {
         if (!cardsMap.get(shuffledArrayCards[cardIterator])) {
-          cardsMap.set(shuffledArrayCards[cardIterator], this.add.image(i, j, shuffledArrayCards[cardIterator]).setInteractive());
+          cardsMap.set(shuffledArrayCards[cardIterator], this.add.image(i, j, shuffledArrayCards[cardIterator]));
           cardsMap.get(shuffledArrayCards[cardIterator]).setScale(0.4, 0.4);
-          cardsMap.set(shuffledArrayCards[cardIterator]+'Back', this.add.image(i, j, 'cardBack').setInteractive());
-          cardsMap.get(shuffledArrayCards[cardIterator]+'Back').setScale(0.4, 0.4);
+          cardsMap.get(shuffledArrayCards[cardIterator]).setName(shuffledArrayCards[cardIterator]);
+
+          cardsMap.set(shuffledArrayCards[cardIterator] + 'Back', this.add.image(i, j, 'cardBack').setInteractive());
+          cardsMap.get(shuffledArrayCards[cardIterator] + 'Back').setScale(0.4, 0.4);
+          cardsMap.get(shuffledArrayCards[cardIterator] + 'Back').setName(shuffledArrayCards[cardIterator] + 'Back');
+          console.log(shuffledArrayCards[cardIterator] + 'Back');
+
           cardIterator++;
-          if(cardIterator==12){
-            cardIterator=0;
+          if (cardIterator == 12) {
+            cardIterator = 0;
             shuffledArrayCards = Utils.shuffleArray(shuffledArrayCards);
           }
         } else {
-          cardsMap.set(shuffledArrayCards[cardIterator] + 'a', this.add.image(i, j, shuffledArrayCards[cardIterator]).setInteractive());
+          cardsMap.set(shuffledArrayCards[cardIterator] + 'a', this.add.image(i, j, shuffledArrayCards[cardIterator]));
           cardsMap.get(shuffledArrayCards[cardIterator] + 'a').setScale(0.4, 0.4);
-          cardsMap.set(shuffledArrayCards[cardIterator]+'aBack', this.add.image(i, j, 'cardBack').setInteractive());
-          cardsMap.get(shuffledArrayCards[cardIterator]+'aBack').setScale(0.4, 0.4);
+          cardsMap.get(shuffledArrayCards[cardIterator] + 'a').setName(shuffledArrayCards[cardIterator] + 'a');
+
+          cardsMap.set(shuffledArrayCards[cardIterator] + 'aBack', this.add.image(i, j, 'cardBack').setInteractive());
+          cardsMap.get(shuffledArrayCards[cardIterator] + 'aBack').setScale(0.4, 0.4);
+          cardsMap.get(shuffledArrayCards[cardIterator] + 'aBack').setName(shuffledArrayCards[cardIterator] + 'aBack');
+
           cardIterator++;
         }
       }
@@ -68,20 +78,40 @@ export default class Bootloader extends Phaser.Scene {
     this.mapCards = new Map();
     this.setCards(this.mapCards);
 
-    // //cardBack
-    // this.cardBack = this.add.image(65,70, "cardBack");
-    // this.cardBack.setScale(0.4, 0.4);
+    //events
+    const events = Phaser.Input.Events;
 
-    // //events
-    // const events = Phaser.Input.Events;
+    this.input.on(events.GAMEOBJECT_DOWN, (pointer, gameObject) => {
+      this.uncoverCard(gameObject.name);
+    });
 
-    // this.imagen1.on(events.POINTER_DOWN, function () {
-    //   alert('vamo a voltear');
-    // });
+    this.input.on(events.GAMEOBJECT_OVER, (pointer, gameObject) => {
+      this.animateHoverCard(gameObject.name);
+    });
 
-    // this.imagen1.on(events.POINTER_MOVE, function () {
-    //   console.log('la vida');
-    // });
+    this.input.on(events.GAMEOBJECT_OUT, (pointer, gameObject) => {
+      this.desanimateHoverCard(gameObject.name);
+    });
+  }
+
+  uncoverCard(name) {
+    this.selectedCards.push(name);
+    if(this.selectedCards.length<=2){
+      this.mapCards.get(name).alpha = 0.0;
+    }else{
+      for(let card of this.selectedCards){
+        this.mapCards.get(card).alpha = 1;
+      }
+      this.selectedCards = [];
+    }
+  }
+
+  animateHoverCard(name) {
+    this.mapCards.get(name).setScale(0.5, 0.5);
+  }
+
+  desanimateHoverCard(name) {
+    this.mapCards.get(name).setScale(0.4, 0.4);
   }
 
 
