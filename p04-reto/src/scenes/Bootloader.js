@@ -103,6 +103,8 @@ export default class Bootloader extends Phaser.Scene {
         this.mapCards.get(card).alpha = 1;
       }
       this.selectedCards = [];
+      // this.selectedCards.push(name);
+      // this.mapCards.get(name).alpha = 0.0;
     }
   }
 
