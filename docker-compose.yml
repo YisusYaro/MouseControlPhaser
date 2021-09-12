@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  node-service:
+  phaser-service:
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -9,5 +9,5 @@ services:
     ports:
       - '3000'
     volumes:
-      - ./p03-reto:/usr/src/app
+      - ./p04-reto:/usr/src/app
     stdin_open: true
