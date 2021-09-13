@@ -26,6 +26,7 @@ export default class Bootloader extends Phaser.Scene {
     this.load.image(this.cards);
     this.load.image('cardBack');
     this.load.image('escenario');
+    this.load.image('welcomeImage');
 
     //audio
     this.load.audio('music', 'cancion_m.mp3');
@@ -89,6 +90,9 @@ export default class Bootloader extends Phaser.Scene {
     this.mapCards = new Map();
     this.setCards(this.mapCards);
 
+    this.welcomeImage = this.add.image(500, 250, "welcomeImage");
+    this.welcomeImage.setScale(0.8, 0.8);
+
     const fxVolume = 0.5;
     const musicVolume = 0.09;
     this.cardSound = this.sound.add('cardSound', { volume: fxVolume, loop: false });
@@ -96,26 +100,32 @@ export default class Bootloader extends Phaser.Scene {
     this.radar = this.sound.add('radar', { volumen: fxVolume, loop: false });
 
     //events
-
     const events = Phaser.Input.Events;
     this.input.on(events.POINTER_DOWN, (evento) => {
       if(this.isFirstClick){
         this.music.play();
         this.isFirstClick = false;
+        this.welcomeImage.destroy();
       }
     });
 
     this.input.on(events.GAMEOBJECT_DOWN, (pointer, gameObject) => {
-      this.uncoverCard(gameObject.name);
+      if(!this.isFirstClick){
+        this.uncoverCard(gameObject.name);
+      }
     });
 
     this.input.on(events.GAMEOBJECT_OVER, (pointer, gameObject) => {
-      this.animateHoverCard(gameObject.name);
-      this.radar.play();
+      if(!this.isFirstClick){
+        this.animateHoverCard(gameObject.name);
+        this.radar.play();
+      }
     });
 
     this.input.on(events.GAMEOBJECT_OUT, (pointer, gameObject) => {
-      this.desanimateHoverCard(gameObject.name);
+      if(!this.isFirstClick){
+        this.desanimateHoverCard(gameObject.name);
+      }
     });
   }
 

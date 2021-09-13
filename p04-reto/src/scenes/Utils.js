@@ -8,7 +8,7 @@ export default class Utils {
     return array;
   }
 
-  //can be imagen12 imagen11 | imagen12a imagen1a| imagen8 imagen9a
+  //can be imagen12 imagen11 | imagen12A imagen1A| imagen8 imagen9A
   static compareCards(cardName1, cardName2){
     cardName1 = cardName1.replace('Back','');
     cardName2 = cardName2.replace('Back','');
