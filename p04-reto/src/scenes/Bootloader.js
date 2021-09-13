@@ -13,7 +13,7 @@ export default class Bootloader extends Phaser.Scene {
     this.matchedCards = [];
     this.matchedCardsGoal = 12;
     this.numberMatchedCards = 0;
-    this.firstClick = false;
+    this.isFirstClick = true;
   }
 
   init() {
@@ -29,7 +29,7 @@ export default class Bootloader extends Phaser.Scene {
 
     //audio
     this.load.audio('music', 'cancion_m.mp3');
-    this.load.audio('cardSound', 'carta.mp3');
+    this.load.audio('cardSound', 'kamehamehaAndFinalFlashCharge.mp3');
     this.load.audio('radar', 'radar.mp3');
   }
 
@@ -89,16 +89,20 @@ export default class Bootloader extends Phaser.Scene {
     this.mapCards = new Map();
     this.setCards(this.mapCards);
 
-    const volume = 0.3;
-    this.cardSound = this.sound.add('cardSound', { volume, loop: false });
-    this.music = this.sound.add('music', { volume, loop: true });
-    this.radar = this.sound.add('radar', { volume, loop: false });
+    const fxVolume = 0.5;
+    const musicVolume = 0.09;
+    this.cardSound = this.sound.add('cardSound', { volume: fxVolume, loop: false });
+    this.music = this.sound.add('music', { volume: musicVolume, loop: true });
+    this.radar = this.sound.add('radar', { volumen: fxVolume, loop: false });
 
     //events
 
     const events = Phaser.Input.Events;
     this.input.on(events.POINTER_DOWN, (evento) => {
-      this.music.play();
+      if(this.isFirstClick){
+        this.music.play();
+        this.isFirstClick = false;
+      }
     });
 
     this.input.on(events.GAMEOBJECT_DOWN, (pointer, gameObject) => {
