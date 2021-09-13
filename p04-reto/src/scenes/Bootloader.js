@@ -29,11 +29,14 @@ export default class Bootloader extends Phaser.Scene {
     this.load.image('escenario');
     this.load.image('welcomeImage');
     this.load.image('final');
+    this.load.image('fracaso');
 
     //audio
     this.load.audio('music', 'cancion_m.mp3');
     this.load.audio('cardSound', 'kamehamehaAndFinalFlashCharge.mp3');
     this.load.audio('radar', 'radar.mp3');
+    this.load.audio('failureSound', 'perder.mp3');
+    this.load.audio('winSound', 'ganar.mp3');
   }
 
 
@@ -99,11 +102,18 @@ export default class Bootloader extends Phaser.Scene {
     this.welcomeImage = this.add.image(500, 250, "welcomeImage");
     this.welcomeImage.setScale(0.8, 0.8);
 
+    this.failure = this.add.image(500, 250, "fracaso");
+    this.failure.setScale(0.8, 0.8);
+    this.failure.alpha = 0;
+
+
     const fxVolume = 0.5;
     const musicVolume = 0.09;
     this.cardSound = this.sound.add('cardSound', { volume: fxVolume, loop: false });
     this.music = this.sound.add('music', { volume: musicVolume, loop: true });
     this.radar = this.sound.add('radar', { volumen: fxVolume, loop: false });
+    this.failureSound = this.sound.add('failureSound', { volumen: fxVolume, loop: false });
+    this.winSound = this.sound.add('winSound', { volumen: fxVolume, loop: false });
 
     //events
     const events = Phaser.Input.Events;
@@ -179,19 +189,19 @@ export default class Bootloader extends Phaser.Scene {
   isGameOver() {
     if (this.matchedCardsGoal == this.numberMatchedCards) {
       this.final = this.add.image(500, 250, 'final');
+      this.timer.destroy();
+      this.winSound.play();
     }
   }
 
   update(time, delta) {
-
     this.elapsedTime = new Date().getTime() - this.start;
-
     this.timer.text = `Tiempo restante: ${ Utils.millisToMinutesAndSeconds(this.maxTime - (this.elapsedTime)) }`;
-
     if(this.elapsedTime >= this.maxTime){
-      alert('perdiste :(');
+      this.failure.alpha = 1;
+      this.failureSound.play();
+      this.timer.destroy();
     }
-
   }
 
 }
