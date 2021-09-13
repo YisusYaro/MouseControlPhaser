@@ -14,6 +14,7 @@ export default class Bootloader extends Phaser.Scene {
     this.matchedCardsGoal = 12;
     this.numberMatchedCards = 0;
     this.isFirstClick = true;
+    this.maxTime = 120000;
   }
 
   init() {
@@ -27,6 +28,7 @@ export default class Bootloader extends Phaser.Scene {
     this.load.image('cardBack');
     this.load.image('escenario');
     this.load.image('welcomeImage');
+    this.load.image('final');
 
     //audio
     this.load.audio('music', 'cancion_m.mp3');
@@ -86,6 +88,10 @@ export default class Bootloader extends Phaser.Scene {
 
     //bg
     this.escenario = this.add.image(500, 250, "escenario");
+
+    this.timer = this.add.text(800, 450, 'Hello World', { font: '"Press Start 2P"' });
+    this.timer.setScale(2,2);
+
     //cards
     this.mapCards = new Map();
     this.setCards(this.mapCards);
@@ -106,6 +112,7 @@ export default class Bootloader extends Phaser.Scene {
         this.music.play();
         this.isFirstClick = false;
         this.welcomeImage.destroy();
+        this.start = new Date().getTime();
       }
     });
 
@@ -171,11 +178,19 @@ export default class Bootloader extends Phaser.Scene {
 
   isGameOver() {
     if (this.matchedCardsGoal == this.numberMatchedCards) {
-      alert('ganaste');
+      this.final = this.add.image(500, 250, 'final');
     }
   }
 
   update(time, delta) {
+
+    this.elapsedTime = new Date().getTime() - this.start;
+
+    this.timer.text = `Tiempo restante: ${ Utils.millisToMinutesAndSeconds(this.maxTime - (this.elapsedTime)) }`;
+
+    if(this.elapsedTime >= this.maxTime){
+      alert('perdiste :(');
+    }
 
   }
 
