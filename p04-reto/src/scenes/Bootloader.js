@@ -1,5 +1,6 @@
 import Utils from "./Utils.js"
 
+
 export default class Bootloader extends Phaser.Scene {
 
   constructor(scene) {
@@ -9,6 +10,10 @@ export default class Bootloader extends Phaser.Scene {
     this.cards = ["imagen1", "imagen2", "imagen3", "imagen4", "imagen5", "imagen6",
       "imagen7", "imagen8", "imagen9", "imagen10", "imagen11", "imagen12"];
     this.selectedCards = [];
+    this.matchedCards = [];
+    this.matchedCardsGoal = 12;
+    this.numberMatchedCards = 0;
+    this.firstClick = false;
   }
 
   init() {
@@ -16,10 +21,16 @@ export default class Bootloader extends Phaser.Scene {
   }
 
   preload() {
+    //images
     this.load.path = "src/scenes/assets/";
     this.load.image(this.cards);
     this.load.image('cardBack');
     this.load.image('escenario');
+
+    //audio
+    this.load.audio('music', 'cancion_m.mp3');
+    this.load.audio('cardSound', 'carta.mp3');
+    this.load.audio('radar', 'radar.mp3');
   }
 
 
@@ -47,7 +58,6 @@ export default class Bootloader extends Phaser.Scene {
           cardsMap.set(shuffledArrayCards[cardIterator] + 'Back', this.add.image(i, j, 'cardBack').setInteractive());
           cardsMap.get(shuffledArrayCards[cardIterator] + 'Back').setScale(0.4, 0.4);
           cardsMap.get(shuffledArrayCards[cardIterator] + 'Back').setName(shuffledArrayCards[cardIterator] + 'Back');
-          console.log(shuffledArrayCards[cardIterator] + 'Back');
 
           cardIterator++;
           if (cardIterator == 12) {
@@ -55,13 +65,13 @@ export default class Bootloader extends Phaser.Scene {
             shuffledArrayCards = Utils.shuffleArray(shuffledArrayCards);
           }
         } else {
-          cardsMap.set(shuffledArrayCards[cardIterator] + 'a', this.add.image(i, j, shuffledArrayCards[cardIterator]));
-          cardsMap.get(shuffledArrayCards[cardIterator] + 'a').setScale(0.4, 0.4);
-          cardsMap.get(shuffledArrayCards[cardIterator] + 'a').setName(shuffledArrayCards[cardIterator] + 'a');
+          cardsMap.set(shuffledArrayCards[cardIterator] + 'A', this.add.image(i, j, shuffledArrayCards[cardIterator]));
+          cardsMap.get(shuffledArrayCards[cardIterator] + 'A').setScale(0.4, 0.4);
+          cardsMap.get(shuffledArrayCards[cardIterator] + 'A').setName(shuffledArrayCards[cardIterator] + 'A');
 
-          cardsMap.set(shuffledArrayCards[cardIterator] + 'aBack', this.add.image(i, j, 'cardBack').setInteractive());
-          cardsMap.get(shuffledArrayCards[cardIterator] + 'aBack').setScale(0.4, 0.4);
-          cardsMap.get(shuffledArrayCards[cardIterator] + 'aBack').setName(shuffledArrayCards[cardIterator] + 'aBack');
+          cardsMap.set(shuffledArrayCards[cardIterator] + 'ABack', this.add.image(i, j, 'cardBack').setInteractive());
+          cardsMap.get(shuffledArrayCards[cardIterator] + 'ABack').setScale(0.4, 0.4);
+          cardsMap.get(shuffledArrayCards[cardIterator] + 'ABack').setName(shuffledArrayCards[cardIterator] + 'ABack');
 
           cardIterator++;
         }
@@ -69,6 +79,7 @@ export default class Bootloader extends Phaser.Scene {
     }
 
   }
+
 
   create() {
 
@@ -78,8 +89,17 @@ export default class Bootloader extends Phaser.Scene {
     this.mapCards = new Map();
     this.setCards(this.mapCards);
 
+    const volume = 0.3;
+    this.cardSound = this.sound.add('cardSound', { volume, loop: false });
+    this.music = this.sound.add('music', { volume, loop: true });
+    this.radar = this.sound.add('radar', { volume, loop: false });
+
     //events
+
     const events = Phaser.Input.Events;
+    this.input.on(events.POINTER_DOWN, (evento) => {
+      this.music.play();
+    });
 
     this.input.on(events.GAMEOBJECT_DOWN, (pointer, gameObject) => {
       this.uncoverCard(gameObject.name);
@@ -87,6 +107,7 @@ export default class Bootloader extends Phaser.Scene {
 
     this.input.on(events.GAMEOBJECT_OVER, (pointer, gameObject) => {
       this.animateHoverCard(gameObject.name);
+      this.radar.play();
     });
 
     this.input.on(events.GAMEOBJECT_OUT, (pointer, gameObject) => {
@@ -95,17 +116,35 @@ export default class Bootloader extends Phaser.Scene {
   }
 
   uncoverCard(name) {
+
     this.selectedCards.push(name);
-    if(this.selectedCards.length<=2){
+    if (this.selectedCards.length <= 2) {
+      this.cardSound.play();
       this.mapCards.get(name).alpha = 0.0;
-    }else{
-      for(let card of this.selectedCards){
+      if (this.selectedCards.length == 2) {
+        if (Utils.compareCards(this.selectedCards[0], this.selectedCards[1])) {
+          this.matchedCards.push(this.selectedCards[0], this.selectedCards)[1];
+          this.numberMatchedCards++;
+          this.removeCardBack(this.selectedCards[0]);
+          this.removeCardBack(this.selectedCards[1]);
+
+          this.isGameOver();
+
+        }
+      }
+    } else {
+
+      for (let card of this.selectedCards) {
         this.mapCards.get(card).alpha = 1;
       }
       this.selectedCards = [];
       // this.selectedCards.push(name);
       // this.mapCards.get(name).alpha = 0.0;
     }
+  }
+
+  removeCardBack(name) {
+    this.mapCards.get(name).destroy();
   }
 
   animateHoverCard(name) {
@@ -116,9 +155,13 @@ export default class Bootloader extends Phaser.Scene {
     this.mapCards.get(name).setScale(0.4, 0.4);
   }
 
+  isGameOver() {
+    if (this.matchedCardsGoal == this.numberMatchedCards) {
+      alert('ganaste');
+    }
+  }
 
   update(time, delta) {
-
 
   }
 

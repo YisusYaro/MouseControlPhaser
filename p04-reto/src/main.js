@@ -15,7 +15,9 @@ const config = {
   pixelArt: true, //Diseño con pixeles definidos (no borrosos)
   backgroundColor: "#34495e", //Color de fondo del canvas ()
   scene: [Bootloader],
+
   };
 
 
   const game = new Phaser.Game(config);
+
