@@ -4,7 +4,7 @@ _Using mouse controls in phaser_
 
 ## Go to site 🚀
 
-[MouseControlPhaser](https://replit.com/@IsaacVilla/Practica04)
+[MouseControlPhaser](https://practica04.isaacvilla.repl.co/)
 
 ### Installation 🔧
 
